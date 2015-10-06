@@ -1,0 +1,10 @@
+https://github.com/Krist-m/www.git
+#Repo clone
+$git clone https://krist-m@github.com/Krist-m/www.git
+
+$git add <file/folder>
+
+$git commit -m "<comment>"
+
+$git push -u origin master
+
