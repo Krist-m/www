@@ -33,6 +33,13 @@ Key varchar(255) UNIQUE NOT NULL,
 Category varchar(255)
 );
 
+CREATE TABLE ServiceProvider
+(
+UID int,
+SID int,
+PRIMARY KEY(UID, SID)
+);
+
 CREATE TABLE Orders
 (
 UID int REFERENCES Users(ID),
