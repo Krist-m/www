@@ -1,15 +1,17 @@
 ﻿---User table---
 CREATE TABLE Users
 (
-ID int PRIMARY KEY,
+ID SERIAL PRIMARY KEY,
 LastName varchar(255),
-FirstName varchar(255) UNIQUE NOT NULL
+FirstName varchar(255) NOT NULL,
+Phone varchar(15),
+Password varchar(255)
 );
 
 --- Address Type like HOME, WORD etc ---
 CREATE TABLE AddressType
 (
-ID int PRIMARY KEY,
+ID SERIAL PRIMARY KEY,
 Lable varchar(255) UNIQUE NOT NULL
 );
 
@@ -31,7 +33,7 @@ PRIMARY KEY(UID, AID)
 --- Service ---
 CREATE TABLE Service
 (
-ID int PRIMARY KEY,
+ID SERIAL PRIMARY KEY,
 Name varchar(255) UNIQUE NOT NULL,
 Key varchar(255) UNIQUE NOT NULL,
 Category varchar(255)
@@ -48,14 +50,14 @@ PRIMARY KEY(UID, SID)
 --- Status discription In progress, Done, Canceled etc ---
 CREATE TABLE Status
 (
-ID int PRIMARY KEY,
+ID SERIAL PRIMARY KEY,
 LABLE varchar(255) UNIQUE NOT NULL
 );
 
 --- Order table---
 CREATE TABLE Orders
 (
-ID int PRIMARY KEY,
+ID SERIAL PRIMARY KEY,
 UID int REFERENCES Users(ID),
 SID int REFERENCES Service(ID) ON DELETE RESTRICT,
 WhenTo TIMESTAMP WITH TIME ZONE,

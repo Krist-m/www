@@ -12,9 +12,9 @@ Created on Aug 20, 2015
 '''           
 def main():
 
-    #ui = SigninUI()
+    ui = SigninUI()
     #ui = SignupUI()
-    ui = HomeUI()
+    #ui = HomeUI()
     #ui = OrderUI()
     #ui = CalendarUI()
     ui.main()

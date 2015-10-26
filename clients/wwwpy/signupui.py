@@ -14,6 +14,8 @@ import threading
 import webbrowser
 from  screen import *
 import gtk, gobject
+from db.dbapi import *
+from user import *
 
 '''
 Created on Jan 21, 2015
@@ -71,10 +73,15 @@ class SignupUI:
         self.profilepicEdit.set_from_pixbuf(scaled_buf)
         self.profilepicEdit.show()                            
     
+        phonenoLabel = gtk.Label()
+        phonenoLabel.set_label("Phoneno:")  
+        self.mPhoneno = gtk.Entry(max=30)    
+        
         usernameLabel = gtk.Label()
         usernameLabel.set_label("User Name:")  
-        self.mUsername = gtk.Entry(max=30)    
-        
+        self.mFirstName = gtk.Entry(max=30)    
+        self.mLastName = gtk.Entry(max=30)    
+                
         passwdLabel = gtk.Label()
         passwdLabel.set_label("Password:")   
         self.mPassWord = gtk.Entry(max=30)
@@ -133,26 +140,32 @@ class SignupUI:
         fix.put(self.profilepic, 150, 130)
         fix.put(self.profilepicEdit, 310, 290)
         
-        fix.put(usernameLabel, 400, 130)
-        fix.put(self.mUsername, 550, 130)
+        
+        fix.put(phonenoLabel, 400, 70)
+        fix.put(self.mPhoneno, 500, 70)
+        
+        fix.put(usernameLabel, 400, 100)
+        fix.put(self.mFirstName, 500, 100)
+        fix.put(self.mLastName, 500, 130)
+        
         
         fix.put(passwdLabel, 400, 160)
-        fix.put(self.mPassWord, 550, 160)
+        fix.put(self.mPassWord, 500, 160)
         
         fix.put(AddressLable, 400, 190)
-        fix.put(self.mAddress, 550, 190)
+        fix.put(self.mAddress, 500, 190)
         
         fix.put(countryLable, 400, 220)
-        fix.put(self.comboboxentry, 550, 220)
+        fix.put(self.comboboxentry, 500, 220)
         
         fix.put(state, 400, 250)
-        fix.put(self.statecb, 550, 250)
+        fix.put(self.statecb, 500, 250)
                        
         fix.put(pincodeLabel, 400, 280)
-        fix.put(self.mZIP, 550, 280)
+        fix.put(self.mZIP, 500, 280)
         
         fix.put(ACLabel, 400, 310)
-        fix.put(self.mWWWAC, 550, 310)
+        fix.put(self.mWWWAC, 500, 310)
         
         fix.put(self.register, 640, 340)
         
@@ -177,8 +190,11 @@ class SignupUI:
 
     
     def register_event(self, widget, data=None):
-        pass
-    
+        user = User(self.mFirstName.get_text(), self.mLastName.get_text(), self.mPassWord.get_text(),
+                    self.mPhoneno.get_text())
+        DBAPI().insert_user_info(user)
+        self.signin_event()     
+        
     def changed_country(self, entry):
         print entry.get_text()
         return
@@ -187,8 +203,9 @@ class SignupUI:
         print entry.get_text()
         return  
     
-    def signin_event(self, widget, data=None):
+    def signin_event(self, widget=None, data=None):
         self.window.destroy()
         import signinui
         signin = signinui.SigninUI()
         signin.main()
+
