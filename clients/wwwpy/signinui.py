@@ -44,8 +44,6 @@ class SigninUI:
         self.window.connect("destroy", self.destroy)
         self.window.set_size_request(self.windowsize.w, self.windowsize.h)
         
-
-
         #***** Menu bar *****#        
         shbox = gtk.HBox(False)
         
@@ -68,8 +66,7 @@ class SigninUI:
         self.mPassWord.set_visibility(False)
         #self.mPassWord.connect("insert-at-cursor", self.password_edit_event)
         #self.mPassWord.set_text("Password")
-
-        
+                
         self.signup = gtk.Button()
         self.signup.set_label("Sign Up")
         self.signup.connect("clicked", self.signup_event, "New sign up")
@@ -79,6 +76,19 @@ class SigninUI:
         self.signin.connect("clicked", self.signin_event, "Log in")
         
         self.rememberPW = gtk.CheckButton("  Remember password")
+        if os.path.exists(os.getcwd()+os.sep+"credentails"):
+            self.rememberPW.set_active(True)
+            f = open(os.getcwd()+os.sep+'credentails', 'rb')
+            line = f.readline()
+            f.close()
+            line = line.split(":")
+            self.mUsername.set_text(line[0])
+            self.mPassWord.set_text(line[1])
+            self.mIsRememberPasswordEnabled = True
+        else:
+            self.mIsRememberPasswordEnabled = False
+            
+        self.rememberPW.connect("toggled", self.remember_password, "RPW")  
           
         fix = gtk.Fixed()
         fix.put(borderimage, 10, 10)
@@ -110,10 +120,21 @@ class SigninUI:
 
     
     def signin_event(self, widget, data=None):
-        self.window.destroy()
-        import home
-        home = home.HomeUI()
-        home.main()
+        res = self.__check_credentails()
+        print res
+        if res is not None:
+            if self.mIsRememberPasswordEnabled:
+                self.__store_password()
+            self.window.destroy()
+            import home
+            home = home.HomeUI(User.create_from_list(res))
+            home.main()
+        else:
+            print "Phone and Password not Matching"
+            message = gtk.MessageDialog(type=gtk.MESSAGE_INFO, buttons=gtk.BUTTONS_OK)
+            message.set_markup("Phone number and Password did not match try to login again...")        
+            message.run()
+            message.destroy()
     
     def password_edit_event(self, widget, data=None):
         print "test"
@@ -124,6 +145,25 @@ class SigninUI:
         # All PyGTK applications must have a gtk.main(). Control ends here
         # and waits for an event to occur (like a key press or mouse event).
         gtk.main()
+        
+    def __check_credentails(self):
+        phoneno = self.mUsername.get_text()
+        passwd = self.mPassWord.get_text()
+        return DBAPI().check_for_autorization(phoneno, passwd)
+        
+    def remember_password(self, widget, data=None):
+        if widget.get_active():
+            self.mIsRememberPasswordEnabled = True
+        else:
+            self.mIsRememberPasswordEnabled = False  
+            os.system("rm "+os.getcwd()+os.sep+"credentails")
+      
+    def __store_password(self):
+        f = open(os.getcwd()+os.sep+'credentails', 'wb')
+        f.write(self.mUsername.get_text()+":"+self.mPassWord.get_text())
+        f.close()
+
+    
       
     
     

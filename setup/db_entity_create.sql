@@ -2,36 +2,32 @@
 CREATE TABLE Users
 (
 ID SERIAL PRIMARY KEY,
-LastName varchar(255),
+LastName varchar(255) NOT NULL,
 FirstName varchar(255) NOT NULL,
-Phone varchar(15),
-Password varchar(255)
+Phone varchar(15) UNIQUE NOT NULL,
+Password varchar(255) NOT NULL,
+Photo bytea,
+ServiceProvider BOOLEAN DEFAULT FALSE
 );
 
---- Address Type like HOME, WORD etc ---
-CREATE TABLE AddressType
-(
-ID SERIAL PRIMARY KEY,
-Lable varchar(255) UNIQUE NOT NULL
-);
 
 --- Address table ---
 CREATE TABLE Address
 (
 UID int REFERENCES Users(ID) ON DELETE RESTRICT,
-AID int REFERENCES AddressType(ID) ON DELETE RESTRICT,
+AddLabel varchar(10),
 HouseNo varchar(255),
 Street varchar(255),
 City varchar(255),
 State varchar(255),
 Country varchar(255),
-Pin varchar(255) UNIQUE NOT NULL,
-AreaCode varchar(255) UNIQUE NOT NULL,
-PRIMARY KEY(UID, AID)
+Pin varchar(255) NOT NULL,
+AreaCode varchar(255),
+PRIMARY KEY(UID, AddLabel)
 );
 
 --- Service ---
-CREATE TABLE Service
+CREATE TABLE Services
 (
 ID SERIAL PRIMARY KEY,
 Name varchar(255) UNIQUE NOT NULL,
@@ -59,11 +55,9 @@ CREATE TABLE Orders
 (
 ID SERIAL PRIMARY KEY,
 UID int REFERENCES Users(ID),
-SID int REFERENCES Service(ID) ON DELETE RESTRICT,
+SID int REFERENCES Services(ID) ON DELETE RESTRICT,
 WhenTo TIMESTAMP WITH TIME ZONE,
 WhenFrom TIMESTAMP WITH TIME ZONE,
-AID int,
-StatusID int REFERENCES Status(ID),
-CONSTRAINT AID FOREIGN KEY(UID, AID)
-REFERENCES Address(UID,AID)
+Who varchar(255),
+StatusID int REFERENCES Status(ID)
 );

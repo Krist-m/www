@@ -30,10 +30,11 @@ lock = None
 
 class HomeUI:
 
-    def __init__(self):
+    def __init__(self, user):
+        self.mUserInfo = user
         self.windowsize = Screen(0, 0, 1000, 600)
         self.init_window_layout()
-        pass
+
         
     #init for UI window layout creation
     def init_window_layout(self):
@@ -64,17 +65,21 @@ class HomeUI:
         image.set_from_pixbuf(scaled_buf)
         image.show()        
         
-        self.profilepic = gtk.Image()
-        pixbuf = gtk.gdk.pixbuf_new_from_file("res"+os.sep+"images"+os.sep+"profilepictemp.png")
+        vbox = gtk.VBox(False)
+        loader = gtk.gdk.PixbufLoader("png")
+        loader.write(self.mUserInfo.mPhoto)
+        loader.close()
+        pixbuf = loader.get_pixbuf()
+        #pixbuf = gtk.gdk.pixbuf_new_from_data(self.mUserInfo.mPhoto,gtk.gdk.COLORSPACE_RGB, False,8,37,29,148)
+        #pixbuf = gtk.gdk.pixbuf_new_from_file("res"+os.sep+"images"+os.sep+"profilepictemp.png")
         scaled_buf = pixbuf.scale_simple(50,50,gtk.gdk.INTERP_BILINEAR)
+        self.profilepic = gtk.Image() 
         self.profilepic.set_from_pixbuf(scaled_buf)
-        self.profilepic.show()
+        vbox.add(self.profilepic)
         
-                   
-    
-        usernameLabel = gtk.Label()
-        usernameLabel.set_label("Kist")
-        
+        username = gtk.Label(self.mUserInfo.mFirstName+" "+self.mUserInfo.mLastName)
+        vbox.add(username)
+        vbox.show_all()
         
         self.signout = gtk.Button()
         self.signout.set_label("Sign Out")
@@ -113,21 +118,15 @@ class HomeUI:
         label = gtk.Label("Service Requests")
         notebook.insert_page(scrollview, label)       
         notebook.show()
-        
-        
-        fix = gtk.Fixed()
-        
+                
+        fix = gtk.Fixed()        
         fix.put(borderimage, 10, 10)
         fix.put(image, 40, 25)        
         fix.put(self.signout, 900, 50)        
-        fix.put(self.profilepic, 840, 40)
+        fix.put(vbox, 840, 40)
         fix.put(notebook, 100, 150)
         fix.put(self.newOrder, 100, 500)
         fix.put(self.mPrint, 200, 500)
-        
-        
-        #fix.put(usernameLabel, 855, 50)
-      
         shbox.add(fix)
         
         fix.show()
