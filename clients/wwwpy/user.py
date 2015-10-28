@@ -1,7 +1,7 @@
 class User:
     
-    def __init__(self, fn, ln, pwd, phoneno, photo, sp = False, servicename = None):
-        self.id = None
+    def __init__(self, fn, ln, pwd, phoneno, photo, sp = False, servicename = None, id = None):
+        self.mId = id
         self.mFirstName = fn
         self.mLastName = ln
         self.mPassword = pwd
@@ -12,5 +12,5 @@ class User:
         
     @staticmethod
     def create_from_list(list):
-        return User(list[1],list[2],list[3],list[4],list[5])
+        return User(list[1],list[2],list[3],list[4],list[5],list[0])
 

@@ -1,3 +1,4 @@
+from ctypes.wintypes import SERVICE_STATUS_HANDLE
 try:
     import pygtk
     pygtk.require('2.0')
@@ -15,21 +16,36 @@ import webbrowser
 import gtk, gobject
 from screen import *
 from calenderui import *
+from db.dbapi import *
 
 '''
-Created on Jan 21, 2015
+Created on Oct 27, 2015
 
 @author: kristapher
 '''           
 lock = None
 
+class Order:
+    OPEN = 1
+    CLOSE = 2
+    ATSTORE = 3
+    
+    def __init__(self, userid, serivceid, whenfrom, whento=None, addId="Home", prefer = None, status = OPEN):
+        self.mUserId = userid
+        self.mServiceid = serivceid
+        self.mWhenFrom = whenfrom
+        self.mWhenTo = whento
+        self.mAddId = addId
+        self.mPrefer = prefer
+        self.mStatus = status        
+
 class OrderUI:
 
-    def __init__(self):
+    def __init__(self, userinfo):
+        self.mUserInfo = userinfo
         self.windowsize = Screen(0, 0, 500, 200)
         self.init_window_layout()
-        pass
-
+        self.whenfrom = None
         
     #init for UI window layout creation
     def init_window_layout(self):
@@ -61,13 +77,13 @@ class OrderUI:
         image.set_from_pixbuf(scaled_buf)
         image.show()                
 
-        self.service = gtk.combo_box_entry_new_text()
-        clist = ["Mineral Water (S1)", "Maid (S6)", "Truck (S2)", "Internet (S3)", "Medical Store(S4)", "Bakery d(S6)"]
-        for c in clist:
-            self.service.append_text(str(c))
-        self.service.child.connect('changed', self.service_select)
-        self.service.set_active(0)
-        
+        self.servicecb = gtk.combo_box_entry_new_text()
+        self.servicelist = [x[1] for x in DBAPI().get_service_list()]
+        print self.servicelist
+        for c in self.servicelist:
+            self.servicecb.append_text(c)
+        self.servicecb.set_active(0)
+        self.servicecb.child.connect('changed', self.service_select)        
         
         self.when = gtk.Entry(max=30)
         self.when.set_editable(False)
@@ -81,7 +97,13 @@ class OrderUI:
         self.calender.add(timg)
         self.calender.connect("clicked", self.setdate_event, "Select date")
         
-        self.where = gtk.Entry(max=30)
+        self.wherecb = gtk.combo_box_entry_new_text()
+        self.addlist = [x[1] for x in DBAPI().get_address_list(self.mUserInfo.mId)]
+        print self.addlist
+        for c in self.addlist:
+            self.wherecb.append_text(c)
+        self.wherecb.set_active(0)
+        self.wherecb.child.connect('changed', self.address_select)
         
         self.order = gtk.Button()
         self.order.set_label("Order")
@@ -91,10 +113,10 @@ class OrderUI:
         fix = gtk.Fixed()
         fix.put(borderimage, 10, 10)
         fix.put(image, 40, 25)
-        fix.put(self.service, 220, 40)
+        fix.put(self.servicecb, 220, 40)
         fix.put(self.when, 220, 70)
         fix.put(self.calender, 340, 69)
-        fix.put(self.where, 220, 100)
+        fix.put(self.wherecb, 220, 100)
         fix.put(self.order, 340, 130)
         
         shbox.add(fix)
@@ -112,16 +134,19 @@ class OrderUI:
         return False
     
     def setdate_event(self, widget, data=None):
-        cal = CalendarUI(self.when)
+        cal = CalendarUI(self.whenfrom)
         cal.main()
         
     def order_event(self, widget, data=None):
-        self.window.destroy()
-        pass
+        DBAPI().inser_order(Order(self.mUserInfo.mId, self.selectedService, self.whenfrom, addlabel=self.selectedAddress))
+        self.window.destroy()        
     
     def service_select(self, entry):
-        print entry
+        self.selectedService = self.servicelist.index(entry.get_text())
     
+    def address_select(self, entry):
+        self.selectedAddress = self.addlist.index(entry.get_text())
+        
     def main(self):
         # All PyGTK applications must have a gtk.main(). Control ends here
         # and waits for an event to occur (like a key press or mouse event).

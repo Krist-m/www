@@ -21,7 +21,7 @@ from servicerequestlist import *
 #import win32print
 
 '''
-Created on Jan 21, 2015
+Created on Oct. 21, 2015
 
 @author: kristapher
 '''           
@@ -164,7 +164,7 @@ class HomeUI:
         signin.main()
 
     def neworder_event(self, widget, data=None):
-        order = OrderUI()
+        order = OrderUI(self.mUserInfo)
         order.main()
         
         

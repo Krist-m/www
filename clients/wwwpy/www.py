@@ -4,6 +4,7 @@ from signupui import *
 from home import *
 from orderui import *
 from calenderui import *
+from user import *
 
 '''
 Created on Aug 20, 2015
@@ -12,10 +13,11 @@ Created on Aug 20, 2015
 '''           
 def main():
 
-    ui = SigninUI()
+    #ui = SigninUI()
     #ui = SignupUI()
     #ui = HomeUI()
-    #ui = OrderUI()
+    user = User('x','x','x','x','x',id=1)
+    ui = OrderUI(user)
     #ui = CalendarUI()
     ui.main()
 
